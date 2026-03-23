@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WiFi Security Scanner</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: Arial;
+            text-align: center;
+        }
+
+        h1 { color: #38bdf8; }
+
+        .card {
+            background: #1e293b;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .green { color: #22c55e; }
+        .yellow { color: #facc15; }
+        .red { color: #ef4444; }
+
+        button {
+            padding: 10px 20px;
+            background: #38bdf8;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>⚡ WiFi Security Scanner</h1>
+
+<button onclick="scan()">🔄 Scan Networks</button>
+
+<canvas id="chart" width="300" height="150"></canvas>
+
+<div id="stats"></div>
+<div id="networks"></div>
+
+<script>
+let chart;
+
+function scan() {
+    fetch("/scan")
+    .then(res => res.json())
+    .then(data => {
+
+        // Update stats
+        document.getElementById("stats").innerHTML =
+            `🟢 ${data.green} | 🟡 ${data.yellow} | 🔴 ${data.red}`;
+
+        // Update networks
+        let html = "";
+        data.networks.forEach(net => {
+            html += `
+            <div class="card">
+                <h3>${net.ssid}</h3>
+                <p>🔐 ${net.encryption}</p>
+                <p>📶 ${net.signal}</p>
+                <p>🔑 ${net.password_strength}</p>
+                <p>👀 Evil Twin: ${net.evil_twin}</p>
+                <p class="${net.risk.toLowerCase()}">🚨 ${net.risk}</p>
+            </div>`;
+        });
+
+        document.getElementById("networks").innerHTML = html;
+
+        // Chart
+        if (chart) chart.destroy();
+
+        chart = new Chart(document.getElementById("chart"), {
+            type: "doughnut",
+            data: {
+                labels: ["Safe", "Moderate", "Risky"],
+                datasets: [{
+                    data: [data.green, data.yellow, data.red]
+                }]
+            }
+        });
+    });
+}
+
+// Auto scan every 5 sec
+setInterval(scan, 5000);
+scan();
+</script>
+
+</body>
+</html>
