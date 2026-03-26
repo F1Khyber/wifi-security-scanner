@@ -2,32 +2,48 @@ def calculate_risk(net, password_strength, evil):
     score = 0
     enc = net.get("encryption", "").lower()
 
-    # Encryption score
+    # 🔐 Encryption (50 max)
     if "open" in enc:
-        score += 0
+        score += 5
     elif "wep" in enc:
-        score += 20
-    elif "wpa" in enc:
-        score += 50
-    elif "wpa2" in enc:
-        score += 80
-    elif "wpa3" in enc:
-        score += 100
-
-    # Password strength
-    if password_strength == "Strong":
         score += 15
+    elif "wpa" in enc and "wpa2" not in enc and "wpa3" not in enc:
+        score += 25
+    elif "wpa2" in enc:
+        score += 40
+    elif "wpa3" in enc:
+        score += 50
+
+    # 🔑 Password (20 max)
+    if password_strength == "Strong":
+        score += 20
+    elif password_strength == "Moderate":
+        score += 10
     elif password_strength == "Weak":
-        score -= 10
+        score += 0
 
-    # Evil twin penalty
+    # 📶 Signal (20 max)
+    signal = net.get("signal", 0)
+    try:
+        signal = int(str(signal).replace('%',''))
+    except:
+        signal = 0
+
+    score += int(signal * 0.2)
+
+    # 👿 Evil Twin (-30 penalty)
     if evil:
-        score -= 40
+        score -= 30
 
-    # Final result
-    if score >= 80:
-        return "Green"
+    # Clamp
+    score = max(0, min(score, 100))
+
+    # Label
+    if score >= 75:
+        risk = "Safe"
     elif score >= 50:
-        return "Yellow"
+        risk = "Moderate"
     else:
-        return "Red"
+        risk = "Risky"
+
+    return score, risk

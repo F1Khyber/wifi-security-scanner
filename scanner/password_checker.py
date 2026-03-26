@@ -15,7 +15,7 @@ def get_password(ssid):
         return None
 
 
-def check_strength(password):
+def check_password_strength(password):
     if not password:
         return "Unknown"
 

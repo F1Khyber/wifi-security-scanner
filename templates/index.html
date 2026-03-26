@@ -1,99 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WiFi Security Scanner</title>
+    <title>WiFi Security Dashboard</title>
 
-    <!-- Chart.js -->
+    <link rel="stylesheet" href="/static/style.css">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body {
-            background: #0f172a;
-            color: #e2e8f0;
-            font-family: Arial;
-            text-align: center;
-        }
-
-        h1 { color: #38bdf8; }
-
-        .card {
-            background: #1e293b;
-            margin: 10px;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .green { color: #22c55e; }
-        .yellow { color: #facc15; }
-        .red { color: #ef4444; }
-
-        button {
-            padding: 10px 20px;
-            background: #38bdf8;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px;
-        }
-    </style>
 </head>
+
 <body>
 
-<h1>⚡ WiFi Security Scanner</h1>
+<div class="main-container">
 
-<button onclick="scan()">🔄 Scan Networks</button>
+    <h1>⚡ WiFi Security Dashboard</h1>
+    <button onclick="loadData()">Scan Networks</button>
 
-<canvas id="chart" width="300" height="150"></canvas>
+    <!-- GRID NETWORKS -->
+    <div id="container" class="grid"></div>
 
-<div id="stats"></div>
-<div id="networks"></div>
+    <!-- CHART -->
+    <div class="chart-box">
+        <canvas id="chart"></canvas>
+    </div>
+
+</div>
 
 <script>
 let chart;
 
-function scan() {
-    fetch("/scan")
-    .then(res => res.json())
-    .then(data => {
+async function loadData() {
+    const res = await fetch('/scan');
+    const networks = await res.json();
 
-        // Update stats
-        document.getElementById("stats").innerHTML =
-            `🟢 ${data.green} | 🟡 ${data.yellow} | 🔴 ${data.red}`;
+    let html = "";
+    let safe = 0, moderate = 0, risky = 0;
 
-        // Update networks
-        let html = "";
-        data.networks.forEach(net => {
-            html += `
-            <div class="card">
+    networks.forEach(net => {
+
+        if (net.risk === "Safe") safe++;
+        else if (net.risk === "Moderate") moderate++;
+        else risky++;
+
+        html += `
+        <div class="card ${net.risk.toLowerCase()}">
+            <div class="card-top">
                 <h3>${net.ssid}</h3>
-                <p>🔐 ${net.encryption}</p>
-                <p>📶 ${net.signal}</p>
-                <p>🔑 ${net.password_strength}</p>
-                <p>👀 Evil Twin: ${net.evil_twin}</p>
-                <p class="${net.risk.toLowerCase()}">🚨 ${net.risk}</p>
-            </div>`;
-        });
+                <span class="score">${net.net_score}/100</span>
+            </div>
 
-        document.getElementById("networks").innerHTML = html;
+            <p>🔐 ${net.encryption}</p>
 
-        // Chart
-        if (chart) chart.destroy();
+            <div class="signal-bar">
+                <div class="signal-fill" style="width:${net.signal}%"></div>
+            </div>
+            <p>${net.signal}% signal</p>
 
-        chart = new Chart(document.getElementById("chart"), {
-            type: "doughnut",
-            data: {
-                labels: ["Safe", "Moderate", "Risky"],
-                datasets: [{
-                    data: [data.green, data.yellow, data.red]
-                }]
+            <p>🔑 Password: ${net.password_strength}</p>
+            <p>⚠ ${net.risk}</p>
+        </div>
+        `;
+    });
+
+    document.getElementById("container").innerHTML = html;
+
+    updateChart(safe, moderate, risky);
+}
+
+function updateChart(safe, moderate, risky) {
+
+    const data = {
+        labels: ["Safe", "Moderate", "Risky"],
+        datasets: [{
+            data: [safe, moderate, risky],
+            backgroundColor: ["#00ff88", "#ffcc00", "#ff4444"],
+            borderWidth: 0
+        }]
+    };
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(document.getElementById("chart"), {
+        type: "doughnut",
+        data: data,
+        options: {
+            cutout: "70%",
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#fff"
+                    }
+                }
             }
-        });
+        }
     });
 }
 
-// Auto scan every 5 sec
-setInterval(scan, 5000);
-scan();
+// AUTO REFRESH
+setInterval(loadData, 10000);
+loadData();
 </script>
 
 </body>
