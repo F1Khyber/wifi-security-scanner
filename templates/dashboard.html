@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>WiFi Security Scanner</title>
+
+    <link
+        rel="stylesheet"
+       href="../static/style.css"
+    >
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>⚡ WiFi Security Scanner</h1>
+
+        <p>
+            Defensive WiFi network monitoring
+        </p>
+
+    </header>
+
+
+    <main>
+
+        <section class="stats">
+
+            <div class="card">
+
+                <h3>Networks</h3>
+
+                <span id="network-count">
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>High Risk</h3>
+
+                <span id="high-risk">
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>Medium Risk</h3>
+
+                <span id="medium-risk">
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>Low Risk</h3>
+
+                <span id="low-risk">
+                    0
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <section class="network-section">
+
+            <div class="section-header">
+
+                <h2>Nearby Networks</h2>
+
+                <button
+                    onclick="loadNetworks()"
+                >
+                    Scan Again
+                </button>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>SSID</th>
+
+                            <th>BSSID</th>
+
+                            <th>Security</th>
+
+                            <th>Signal</th>
+
+                            <th>Channel</th>
+
+                            <th>Risk</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="network-table">
+
+                        <tr>
+
+                            <td colspan="6">
+                                Scanning...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    
+        <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    
+
+</body>
+
+</html>
