@@ -95,6 +95,12 @@ def get_networks():
                 findings
             )
 
+            print("========== RISK DEBUG ==========")
+            print("Findings:", findings)
+            print("Risk:", risk)
+            print("Risk type:", type(risk))
+            print("Risk dict:", getattr(risk, "__dict__", "NO __dict__"))
+            print("================================")
 
             # -------------------------------------
             # Add risk to network

@@ -24,5 +24,5 @@ Channel: {network.get('channel')}
 Detected anomalies:
 {chr(10).join(alert_text)}
 
-Risk: {network.get('risk', 'UNKNOWN')}
+Risk: {network.get('risk', 'unkown')}
 """.strip()

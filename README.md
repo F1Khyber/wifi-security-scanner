@@ -93,6 +93,71 @@ What comes next
 
 The main remaining work is to fully connect Evil Twin + ARP detection into the API/risk engine, then add RAG so the system can retrieve similar historical/security knowledge and provide an explanation for why a network is considered suspicious.
 
+
+## AI MODEL
+
+                    Wi-Fi Network
+                         │
+       ┌─────────────────┼─────────────────┐
+       │                 │                 │
+       ▼                 ▼                 ▼
+wifi_scanner       signal_monitor     network_metrics
+       │                 │                 │
+       │                 ▼                 │
+       │             signal_score          │
+       │                                   │
+       ├──── password_checker ──► password_score
+       │
+       ├──── evil_twin ─────────► evil_twin_score
+       │
+       └──── arp_detector ──────► arp_score
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │ ML Risk Model │
+                 └───────┬───────┘
+                         │
+                         ▼
+                  score: 0–100
+                         │
+                         ▼
+                 GREEN/YELLOW/RED
+
+# Layer 1 — Detection models
+
+ARP dataset
+    ↓
+ARP detector model
+    ↓
+arp_score
+
+Evil Twin dataset
+    ↓
+Evil Twin detector model
+    ↓
+evil_twin_score
+
+Network metrics dataset
+    ↓
+Network anomaly model
+    ↓
+network_metrics_score
+
+# LAYER 2
+
+encryption_score
+signal_score
+password_score
+arp_score
+evil_twin_score
+network_metrics_score
+             │
+             ▼
+       ML Risk Model
+             │
+             ▼
+      final risk score
+
 ## Installation
 
 Clone the repository:
