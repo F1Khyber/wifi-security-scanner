@@ -136,7 +136,7 @@ function updateStatistics(networks) {
 
     networks.forEach((network) => {
 
-        const risk = network?.risk ?? {};
+        const risk = network?.security_analysis?.risk ?? {};
 
 
         /*
@@ -413,7 +413,7 @@ function renderNetworks(networks) {
          */
 
         const risk =
-            network?.risk ?? {};
+            network?.security_analysis?.risk ?? {};
 
 
         console.log(
